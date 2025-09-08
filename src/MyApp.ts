@@ -11,14 +11,9 @@ export class MyApp extends LitElement {
     css`
       :host {
         display: inline-block;
+        width: 100%;
         box-sizing: border-box;
       }
     `,
   ];
-}
-
-declare global {
-  interface HTMLElementTagNameMap {
-    "my-app": MyApp;
-  }
 }

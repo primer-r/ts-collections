@@ -3,6 +3,7 @@ import type {
   DateInput,
   DatesDifference,
   Difference,
+  Duration,
 } from "@/types/date";
 import { plural, substringOf } from "./formatter";
 
@@ -37,13 +38,15 @@ export const WEEKDAYS = [
 export const MonthAbbreviations = MONTHS.map(substringOf);
 export const WeekdayAbbreviations = WEEKDAYS.map(substringOf);
 
+let durationCache = new Map<Duration, { month: number; week: number }>();
+
 export const formatDate = (raw?: DateInput, format: string = "dd MMM yyyy") => {
   if (!(raw && format)) return raw;
   const meta = dateMetaOf(raw);
   const keys = Object.keys(meta).sort((a, b) => b.length - a.length);
 
   return format.replace(
-    new RegExp(`${keys.join("|")}`, "g"),
+    new RegExp(`${keys.join("|")}`, "gi"),
     (mtachedKey) => meta[mtachedKey as DateFormat] + ""
   );
 };
@@ -75,17 +78,49 @@ export const diffDates = (
   };
 };
 
+export const sumDuration = (
+  { meta, formatter, ...rest }: Partial<DatesDifference>,
+  duartionToAdd: Duration
+): Partial<Omit<DatesDifference, "meta">> => {
+  if (!meta?.time || !duartionToAdd) return {};
+  const { month, week } = toMonthWeek(duartionToAdd);
+  const difference = roundUp(
+    rest.year,
+    (rest.month || 0) + month,
+    (rest.week || 0) + week
+  );
+  return { ...difference, formatter: durationFormatter(difference) };
+};
+
+export const toMonthWeek = (duration?: Duration) => {
+  if (!duration) return { month: 0, week: 0 };
+  if (durationCache.has(duration)) {
+    return durationCache.get(duration) || { month: 0, week: 0 };
+  }
+  const count = ["", "ONE", "TWO", "THREE", "FOUR", "FIVE", "SIX"].indexOf(
+    duration.split("_")?.[0]
+  );
+  if (count === -1) return { month: 0, week: 0 };
+  const result = {
+    month: duration.includes("MONTH") ? count : 0,
+    week: duration.includes("WEEK") ? count : 0,
+  };
+  durationCache.set(duration, result);
+  return result;
+};
+
 export const durationFormatter =
   (difference: Partial<Difference>) =>
   (format = "year month week") => {
-    if (!(format && difference.time)) return "";
+    if (!(format && difference)) return "";
     return format
       .replace(
         /year|month|week|day|time/gi,
         (matched) =>
           plural(matched, difference[matched as keyof Difference]) ?? matched
       )
-      .replace(/\s+/g, " "); // NOTE: replace multiple spaces with single space
+      .replace(/\s+/g, " ") // NOTE: replace multiple spaces with single space
+      .trim();
   };
 
 export const roundUp = (
@@ -178,9 +213,9 @@ export const toNewDate = (
   monthsToAdd: number = 0,
   datesToAdd: number = 0
 ) => {
-  if (!date) return date;
+  if (!date) return new Date(date);
   const copy = toDate(date);
-  if (!copy) return date;
+  if (!copy) return new Date(date);
   return new Date(
     copy.getFullYear() + (yearsToAdd || 0),
     copy.getMonth() + (monthsToAdd || 0),
@@ -195,4 +230,9 @@ export const toDate = (raw?: DateInput): Date | null => {
 };
 
 export const isValidDate = (date?: Date) =>
-  date instanceof Date && isNaN(date.getTime());
+  date instanceof Date && !isNaN(date.getTime());
+
+export const daysOfMonth = (date?: Date) => {
+  if (!(date && isValidDate(date))) return 0;
+  return toNewDate(date, 0, 1).getDate();
+};

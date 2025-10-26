@@ -19,6 +19,18 @@ export type DateFormat =
   | "EEE"
   | "EEEE";
 
+export type Duration =
+  | "ONE_WEEK"
+  | "TWO_WEEKS"
+  | "THREE_WEEKS"
+  | "ONE_MONTH"
+  | "TWO_MONTHS"
+  | "THREE_MONTHS"
+  | "FOUR_MONTHS"
+  | "FIVE_MONTHS"
+  | "SIX_MONTHS"
+  | "NOT_ALLOWED";
+
 export type DateInput = string | Date;
 
 export type Difference = {

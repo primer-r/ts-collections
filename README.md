@@ -1,3 +1,10 @@
+###### Getting started
+
+- `pnpm run dev` dev server to view page
+- `pnpm run build` to check test coverage and prepare dist package for publishing
+- `npx openapi-typescript https://serviceURL/v3/api-docs --output src/types/api.docs.ts --enum-values`
+- `npx openapi-typescript https://serviceURL/v3/api-docs --output src/types/api.docs.d.ts`
+
 ##### Pitfalls
 
 - [pnpm and vite version compatibility](https://vite.dev/guide/#scaffolding-your-first-vite-project)

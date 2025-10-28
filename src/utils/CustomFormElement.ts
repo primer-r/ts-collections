@@ -52,4 +52,18 @@ export abstract class CustomFormElement<T = string> extends LitElement {
     }
     return typeof validator !== "function" || validator(this.value);
   };
+
+  scrollToTarget = (
+    selector: Array<string> | string,
+    options?: ScrollIntoViewOptions
+  ) =>
+    this.updateComplete.then(() => {
+      if (!this.shadowRoot || !selector) return;
+      const selectorName = !Array.isArray(selector)
+        ? selector
+        : selector.find(this.shadowRoot.querySelector) || "";
+      this.shadowRoot
+        .querySelector(selectorName)
+        ?.scrollIntoView({ behavior: "smooth", block: "nearest", ...options });
+    });
 }

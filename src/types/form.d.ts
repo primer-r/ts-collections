@@ -15,3 +15,5 @@ export type FormItemAtrribute<T> = {
   options: Array<T>;
   filterablea: boolean;
 };
+
+export type Option = Pick<FormItemAtrribute, "name" | "value">;

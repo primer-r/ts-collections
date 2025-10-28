@@ -40,8 +40,11 @@ export const WeekdayAbbreviations = WEEKDAYS.map(substringOf);
 
 let durationCache = new Map<Duration, { month: number; week: number }>();
 
-export const formatDate = (raw?: DateInput, format: string = "dd MMM yyyy") => {
-  if (!(raw && format)) return raw;
+export const formatDate = (
+  raw?: DateInput,
+  format: string = "dd MMM yyyy"
+): string => {
+  if (!(raw && format)) return "";
   const meta = dateMetaOf(raw);
   const keys = Object.keys(meta).sort((a, b) => b.length - a.length);
 
@@ -208,12 +211,12 @@ export const dateMetaOf = (
 export const pad = (val: number, len = 2) => val.toString().padStart(len, "0");
 
 export const toNewDate = (
-  date: DateInput,
+  date?: DateInput,
   yearsToAdd: number = 0,
   monthsToAdd: number = 0,
   datesToAdd: number = 0
 ) => {
-  if (!date) return new Date(date);
+  if (!date) return new Date(date || "");
   const copy = toDate(date);
   if (!copy) return new Date(date);
   return new Date(

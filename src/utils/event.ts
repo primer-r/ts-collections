@@ -4,7 +4,8 @@ export type EventName =
   | "form.input"
   | "form.update"
   | "sort"
-  | "filter";
+  | "filter"
+  | "cell.click";
 
 export const dispatchCustomEvent = <T = string>(
   target: EventTarget,

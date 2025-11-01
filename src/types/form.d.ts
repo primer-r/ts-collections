@@ -8,12 +8,17 @@ export type FormItemAtrribute<T> = {
   // input text, textarea
   min: number;
   max: number;
+  maxLength: number;
+  minLength: number;
   pattern: string;
   // input radio, input checkbox, select, multi-select
   checked: boolean;
   cancelable: boolean;
-  options: Array<T>;
-  filterablea: boolean;
+  options: Array<Option<T>>;
+  filterable: boolean;
+  cancelable: boolean;
+  label: string;
+  showTitle: boolean;
 };
 
-export type Option = Pick<FormItemAtrribute, "name" | "value">;
+export type Option<T = string> = Pick<FormItemAtrribute, "label" | "value">;

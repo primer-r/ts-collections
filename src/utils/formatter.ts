@@ -22,3 +22,11 @@ export const plural = (name: string, value?: number) => {
   if (!value) return "";
   return `${value} ${name}${value > 1 ? "s" : ""}`?.trim();
 };
+
+export const concatBy = (
+  className: string,
+  condition?: boolean | string | number,
+  separator = " "
+) => {
+  return condition ? separator + className : "";
+};

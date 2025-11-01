@@ -5,7 +5,7 @@ import type {
   TableColumn,
   TableMeta,
 } from "@/types/table";
-import { css, html, LitElement, unsafeCSS } from "lit";
+import { css, type CSSResult, html, LitElement, unsafeCSS } from "lit";
 import { customElement, property, state } from "lit/decorators.js";
 import { repeat } from "lit/directives/repeat.js";
 import { styleMap } from "lit/directives/style-map.js";
@@ -19,7 +19,7 @@ import { dispatchCustomEvent } from "@/utils/event";
  */
 @customElement("custom-table")
 export class CustomTable<T> extends LitElement {
-  externalStyle? = "";
+  externalStyle?: string | CSSResult = "";
   enableSorting: boolean | Array<keyof T> = false;
   @property({ type: Array }) list: Array<T> = [];
   @property({ type: Array }) columns: Array<TableColumn<T>> = [];

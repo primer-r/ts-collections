@@ -1,5 +1,5 @@
-import type { FormItemAtrribute } from "@/types/form";
-import { LitElement, type PropertyValues } from "lit";
+import type { FormItemAtrribute, Option } from "@/types/form";
+import { html, LitElement, type PropertyValues } from "lit";
 import { property, state } from "lit/decorators.js";
 
 export abstract class CustomFormElement<T = string> extends LitElement {
@@ -14,7 +14,11 @@ export abstract class CustomFormElement<T = string> extends LitElement {
     return this.opt?.name ?? "";
   }
 
-  get options(): Array<T> {
+  get required(): boolean {
+    return !!this.opt?.required && !this.opt?.disabled;
+  }
+
+  get options(): Array<Option<T>> {
     return Array.isArray(this.opt?.options) ? this.opt?.options : [];
   }
 
@@ -27,6 +31,7 @@ export abstract class CustomFormElement<T = string> extends LitElement {
     super.willUpdate(_changedProperties);
     if (_changedProperties.has("opt")) {
       this.value = this.opt?.value;
+      this.validate();
     }
     // TODO: maybe validate inside of each component whenever value changed instead of detect value change here
     if (_changedProperties.has("value")) {
@@ -41,10 +46,9 @@ export abstract class CustomFormElement<T = string> extends LitElement {
 
   validate = (validator?: (value?: T) => boolean) => {
     this.error = "";
-    const { disabled, required } = this.opt || {};
-    if (disabled) return true;
+    if (this.opt?.disabled) return true;
     if (
-      required &&
+      this.required &&
       !(Array.isArray(this.value) ? this.value.length : this.value)
     ) {
       this.error = "Please fill this mandatory field";
@@ -55,15 +59,26 @@ export abstract class CustomFormElement<T = string> extends LitElement {
 
   scrollToTarget = (
     selector: Array<string> | string,
+    length: number = this.options.length,
     options?: ScrollIntoViewOptions
-  ) =>
+  ) => {
+    if (!selector || length < (this.opt?.minLength || 0)) return;
     this.updateComplete.then(() => {
       if (!this.shadowRoot || !selector) return;
       const selectorName = !Array.isArray(selector)
         ? selector
-        : selector.find(this.shadowRoot.querySelector) || "";
-      this.shadowRoot
-        .querySelector(selectorName)
-        ?.scrollIntoView({ behavior: "smooth", block: "nearest", ...options });
+        : selector.find((it) => it && this.shadowRoot?.querySelector(it));
+      selectorName &&
+        this.shadowRoot.querySelector(selectorName)?.scrollIntoView({
+          behavior: "smooth",
+          block: "nearest",
+          ...options,
+        });
     });
+  };
+
+  renderError = () => {
+    if (!this.error) return "";
+    return html`<span part="error" class="error color">${this.error}</span>`;
+  };
 }

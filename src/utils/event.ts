@@ -5,7 +5,8 @@ export type EventName =
   | "form.update"
   | "sort"
   | "filter"
-  | "cell.click";
+  | "cell.click"
+  | "change";
 
 export const dispatchCustomEvent = <T = string>(
   target: EventTarget,
